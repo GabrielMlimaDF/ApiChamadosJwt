@@ -1,6 +1,9 @@
-﻿using ChamadosApi.Application.Usuarios.Commands;
+﻿using ChamadosApi.Application.Auth.Services;
+using ChamadosApi.Application.Usuarios.Commands;
 using ChamadosApi.Application.Usuarios.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ChamadosApi.WebApi.Controllers
 {
@@ -9,13 +12,16 @@ namespace ChamadosApi.WebApi.Controllers
     public class UsuariosController : ControllerBase
     {
         private readonly IUsuarioService _usuarioService;
+        private readonly IAuthService _authService;
 
-        public UsuariosController(IUsuarioService usuarioService)
+        public UsuariosController(IUsuarioService usuarioService, IAuthService authService)
         {
             _usuarioService = usuarioService;
+            _authService = authService;
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Post([FromBody] CreateUsuarioCommand command)
         {
             var usuario = await _usuarioService.CriarAsync(command);
@@ -23,18 +29,27 @@ namespace ChamadosApi.WebApi.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest login)
         {
             var usuario = await _usuarioService.LoginAsync(login.Email, login.Senha);
             if (usuario == null) return Unauthorized("Credenciais inválidas.");
-            return Ok(usuario);
+
+            var token = _authService.GerarToken(usuario); // ou chamar a função GerarToken direto aqui
+            return Ok(new { usuario, token });
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll()
         {
-            var usuarios = await _usuarioService.ListarAsync();
-            return Ok(usuarios);
+            Guid usuarioId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var usuario = await _usuarioService.ObterPorIdAsync(usuarioId);
+            if (usuario == null)
+                return NotFound();
+
+            return Ok(usuario);
         }
     }
 

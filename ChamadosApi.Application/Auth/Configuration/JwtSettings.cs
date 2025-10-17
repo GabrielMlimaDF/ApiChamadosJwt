@@ -1,4 +1,4 @@
-﻿namespace ChamadosApi.WebApi.Configurations
+﻿namespace ChamadosApi.Application.Auth.Configuration
 {
     public class JwtSettings
     {

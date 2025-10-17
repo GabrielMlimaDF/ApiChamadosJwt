@@ -14,6 +14,6 @@ namespace ChamadosApi.Application.Usuarios.Services
 
         Task<UsuarioDto?> LoginAsync(string email, string senha);
 
-        Task<IEnumerable<UsuarioDto>> ListarAsync();
+        Task<UsuarioDto?> ObterPorIdAsync(Guid usuarioId);
     }
 }

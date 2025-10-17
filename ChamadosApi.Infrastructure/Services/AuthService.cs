@@ -1,4 +1,5 @@
-﻿using ChamadosApi.Application.Auth.Services;
+﻿using ChamadosApi.Application.Auth.Configuration;
+using ChamadosApi.Application.Auth.Services;
 using ChamadosApi.Application.Usuarios.Dtos;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

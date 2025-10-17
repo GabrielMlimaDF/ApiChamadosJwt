@@ -47,16 +47,18 @@ namespace ChamadosApi.Infrastructure.Services
             return usuario == null ? null : MapToDto(usuario);
         }
 
-        public async Task<IEnumerable<UsuarioDto>> ListarAsync()
+        public async Task<UsuarioDto?> ObterPorIdAsync(Guid usuarioId)
         {
             return await _context.Usuarios
+                .Where(u => u.Id == usuarioId)
                 .Select(u => new UsuarioDto
                 {
                     Id = u.Id,
                     Nome = u.Nome,
                     Email = u.Email,
                     Tipo = u.Tipo
-                }).ToListAsync();
+                })
+                .FirstOrDefaultAsync();
         }
 
         private static string GerarHash(string senha)
